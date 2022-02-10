@@ -79,7 +79,38 @@ STL提供了三个序列式容器：向量（vector）、双端队列（deque）
 
 5. array
 6. string
-
+Notes: 对于char型赋值，如果不加''，赋的是ascii
+example:char i=1 and char i='1'，后者才是真正的字符1
+1）构造
+    string s1();  // si = ""
+    string s2("Hello");  // s2 = "Hello"
+    string s3(4, 'K');  // s3 = "KKKK"
+    string s4("12345", 1, 3);  //s4 = "234"，即 "12345" 的从下标 1 开始，长度为 3 的子串
+错误构造：
+    string s1('K');
+    string s2(123);
+2）遍历
+3）插入/删除
+4）排序
+5）求字串
+    substr
+    substr 成员函数可以用于求子串 (n, m)
+```    
+    string s1 = "this is ok";
+    string s2 = s1.substr(2, 4);  // s2 = "is i"
+    s2 = s1.substr(2);  // s2 = "is is ok"
+```
+6）string转换成int
+atoi()的参数是 const char* ,
+因此对于一个字符串str我们必须调用 
+c_str()的方法把这个string转换成 const char*类型的,
+```
+1 std::string str = "123";
+2 int n = atoi(str.c_str());
+3 cout<<n; //123
+```
+而stoi()的参数是const string*,不需要转化为 const char*；
+stoi(string)
 
 
 ## 2关联容器
