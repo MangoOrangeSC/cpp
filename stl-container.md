@@ -14,7 +14,14 @@ STL容器主要分为
 序列容器（sequence container顺序容器）—— 将一组具有相同类型T的对象，以严格的线性形式组织在一起。序列容器可以视为数组和链表的推广。其中每个元素均有固定位置—取决于插入时机和地点，和元素值无关。如果你以追加方式对一个群集插入六个元素，它们的排列次序将和插入次序一致。
 STL提供了三个序列式容器：向量（vector）、双端队列（deque）、列表（list），此外也可以把 string 和 array 当做一种序列式容器。
 强调值的顺序，每个元素有固定的位置。
+
 ### 1. vector
+
+单端数组
+                                           push_back()
+     front()     **--**--**--**--**--**    back()
+                                           pop_back()
+    v.rend()/v.begin()                     v.end()/v.rbegin()
 
 1）构造
 	
@@ -23,29 +30,77 @@ STL提供了三个序列式容器：向量（vector）、双端队列（deque）
 	(3) vector<int> v3(n,num);//指定了开始的容量n和每个格子的默认值为num
 	(4) vector(v.begin(),v.end());
 
-2）遍历
+2）遍历/数据存取
 
-	容器支持随机访问vec[n]
 	可以用迭代器遍历
+	.at(int index)
+	vec[]
+	.front()
+	.back()
+```
+void printvector(std::vector<int> vec)
+{
+    for(std::vector<int>::iterator it=vec.begin();it!=vec.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+}
+
+int main()
+{
+    std::vector<int> vec(10,11);
+    printvector(vec);
+    
+    for(int i=0;i<vec.size();i++)
+    {
+        std::cout<<vec[i]<<std::endl;
+    }
+}
+```
 
 3）插入/删除
 
     .pushback()
     .popback()
-    .pushfront()
-    .popfront()
+    //.pushfront() 可以用，但效率很低
+    //.popfront()
     .insert(iter,ele)
+    .insert(iter,n,ele) iter处插入n各ele
+    .erase(iter)
+    .erase(iter_start,iter_end)
+    .clear 清除
 
 4）排序
 
-    sort函数
+    sort函数：默认从小大大。对支持随机访问的迭代器的容器，都可以利用sort
 
+5) 容量与大小
+
+```
+    .empty() 
+    .size()
+    .resize(int num) 重新指定容器长度num，若变长，则以默认值填充，若变短，则末尾超出容器的长度的元素被删除
+    .resize(int num,elem)
+    .reverse(int len) 容器预留len个长度，预留位置不初始化，元素不可访问;resize初始化了。该命令主要为了减少vector在动态扩展容量时的扩展次数
+```
 
 ### 2. deque
 
-   deque(double-ended queue 双端队列)
+   deque(double-ended queue 双端队列)：双端数组，可以对头部进行插入删除操作
    向两端插入元素效率较高！
    中间插入元素效率较低！
+
+   deque与vector
+   1. vector堆头部插入删除效率很低
+   2. deque堆头部的插入删除速度比vector快
+   3. vector访问元素的速度快
+
+```
+     push_front                            push_back()
+     front()     **--**--**--**--**--**    back()
+     pop_front()                           pop_back()
+    v.rend()/v.begin()                     v.end()/v.rbegin()
+```
 
    1）构造
 
@@ -53,10 +108,24 @@ STL提供了三个序列式容器：向量（vector）、双端队列（deque）
 	(2) deque<int> d2(10);
 	(3) deque<int> d3(n,num);
 
-   2）遍历
+   2）遍历/数据存取
 
-	容器支持随机访问d[n]
 	可以用迭代器遍历
+	.at(int index)
+	vec[]
+	.front()
+	.back()
+
+```
+void printDeque(const std::deque<int> d)
+{
+    for(std::deque<int>::const_iterator it=d.begin();it!=d.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+}
+```
+
 
    3）插入/删除
 
@@ -65,15 +134,40 @@ STL提供了三个序列式容器：向量（vector）、双端队列（deque）
     .pushfront()
     .popfront()
     .insert(iter,ele)
+    .insert(iter,n,elem)
+    .erase(iter)
+    .clear()
 
    4）排序
 
-    sort函数
+    sort函数：默认从小到大
+
+   5) 容量与大小
+
+```
+    .empty()
+    .resize(num)
+    .resize(num,elem)
+```
+
 
 ### 3. list
 
+   链表list是一种物理存储单元上非连续的存储结构，数据元素的逻辑顺序通过链表中的指针链接实现
    双向链表，底层是一个环状的循环链表，由于其链表节点具有pre和next域，所以list也支持push_back、push_front、pop_back、pop_front
    它的底层不是连续的 所以不能通过[]随机访问元素 但是可以双向遍历
+
+```
+     push_front                            push_back()
+     front()     **--**--**--**--**--**    back()
+     pop_front()                           pop_back()
+    v.rend()/v.begin()                     v.end()/v.rbegin()
+```
+
+   由于链表的存储方式并不是连续的内存空间，所以迭代器只支持前移和后移，属于双向迭代器，非随机访问迭代器
+   链表的插入删除很方便，但占用空间大，遍历速度慢
+   list有一个重要性质，插入操作和删除操作不会造成原有迭代器的失效，这在vector中不成立
+
 
    1）构造
 
@@ -81,10 +175,14 @@ STL提供了三个序列式容器：向量（vector）、双端队列（deque）
 	(2) list<int> l2(10);
 	(3) list<int> l3(n,num);
 
-   2）遍历
+   2）遍历/存取
 
-    迭代器不支持随机访问
-    迭代器遍历
+	可以用迭代器遍历
+	不支持随机存取
+	//.at(int index)
+	//vec[]
+	.front()
+	.back()
 
    3）插入/删除
 
@@ -94,13 +192,71 @@ STL提供了三个序列式容器：向量（vector）、双端队列（deque）
     .popfront()
     .insert(iter,ele)
     .erase(pos)
+    .remove(elem) 删除容器中所有与elem值匹配的元素
+    .clear
 
-   4）排序
+
+   4) 排序
 
     不能用sort函数排序，所有不支持随机访问迭起器的容器，都不能用标准算法
     list.sort();//默认顺序从小到大
     list.reverse();//反转链表
     可通过函数或仿函数自定义排序
+
+ ```
+ void printList(const std::list<int> ll)
+{
+    for(std::list<int>::const_iterator it=ll.begin();it!=ll.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+}
+
+bool myCompare(int m,int n)
+{
+    return m>n;
+}
+
+class myCompare1
+{
+public:
+    bool operator()(int m,int n)
+    {
+        return m>n;
+    }
+};
+
+int main()
+{
+
+    std::list<int> lll;
+    lll.push_back(5);
+    lll.push_back(4);
+    lll.push_back(8);
+    lll.push_back(1);
+    lll.sort();
+    printList(lll);
+    std::cout<<"*******"<<std::endl;
+    lll.sort(myCompare);
+    
+    lll.sort(myCompare1())
+    printList(lll);
+
+}
+
+ ```
+
+ 
+
+   5) 大小操作
+
+```
+    .size()
+    .empty()
+    .resize(num)
+    .resize(num,elem)
+```
+
 
 ### 4. forward_list
 
