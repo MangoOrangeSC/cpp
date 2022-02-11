@@ -326,7 +326,148 @@ pair类模板
 
 注意一下：make_pair()函数内调用的仍然是pair构造函数
 
-### 1. map
+
+
+### 1. set
+
+构造set集合的主要目的是为了快速检索,去重与排序
+set存储的是一组无重复的元素，而multiset允许存储有重复的元素;
+如果要修改某一个元素值，必须先删除原有的元素，再插入新的元素。
+
+1）构造
+
+	(1) set<int> s1;
+	(2) set<int,op> s2;  op为排序规则;默认为从小到大进行排序
+
+2）遍历
+
+    迭代器不支持随机访问
+
+3）插入/删除
+
+    .insert(elem)  set的insert返回值为一个pair<set<int>::iterator,bool>。
+               bool标志着插入是否成功，而iterator代表插入的位置，
+               若该键值已经在set中，则iterator表示已存在的该键值在set中的位置。插入数据后自动排序
+    .erase(elem)  //删除容器中值为elem的元素
+    .erase(pos)   //删除pos迭代器所指的元素，返回下一个元素的迭代器
+
+4）排序
+
+    set容器默认排序为从小到大
+    且set在创建好以后就不能进行排序操作，必须在创建时定义排序规则
+    通过函数或仿函数自定义排序,必须在创建容器时定义set<int,MyCompare>
+
+定义比较函数（或比较类/结构体）
+     set容器在判定已有元素a和新插入元素b是否相等时，是这么做的：
+    （1）将a作为左操作数，b作为右操作数，调用比较函数，并返回比较值 ；
+    （2）将b作为左操作数，a作为右操作数，再调用一次比较函数，并返回比较值。
+     也就是说，假设有比较函数f(x,y)，要对已有元素a和新插入元素b进行比较时，会先进行f(a,b)操作，再进行f(b,a)操作，然后返回两个bool值。
+    如果1、2两步的返回值都是false，则认为a、b是相等的，则b不会被插入set容器中；
+    如果1返回true而2返回false，那么认为b要排在a的后面，反之则b要排在a的前面；
+    如果1、2两步的返回值都是true，则可能发生未知行为。
+
+```
+class MySetCompare
+{
+public:
+    bool operator()(int m,int n)
+    {
+        return m>n;
+    }
+};
+
+void printSet(std::set<int> se)
+{
+    for(std::set<int>::const_iterator it=se.begin();it!=se.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+}
+void printSet(std::set<int,MySetCompare> se)
+{
+    for(std::set<int,MySetCompare>::const_iterator it=se.begin();it!=se.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+}
+
+
+void testSet()
+{
+    std::set<int> s1;
+    s1.insert(10);
+    s1.insert(50);
+    s1.insert(40);
+    s1.insert(30);
+    s1.insert(20);
+    printSet(s1);
+
+	//指定排序规则
+    std::set<int,MySetCompare> s2;
+    s2.insert(10);
+    s2.insert(50);
+    s2.insert(40);
+    s2.insert(30);
+    s2.insert(20);
+    printSet(s2);
+}
+
+class myCompare
+{
+public:
+    bool operator()(int m,int n)
+    {
+        return m>n;
+    }
+};
+```
+
+
+5）大小操作
+
+    .size()
+    .empty()
+
+6）查找与统计
+
+    find(key) //查找key是否存在，若存在，返回该键的元素的迭代器，若不存在，返回set.end();
+    count(key) //统计key的元素个数
+
+7）set与multiset的区别
+
+    set不可以插入重复数据
+    set插入数据的同时会返回插入结果，表示是否成功
+    multiset可以插入重复数据
+
+```
+    std::set<int> s;
+    std::pair<std::set<int>::iterator,bool> ret=s.insert(10);
+    if(ret.second){
+        std::cout<<"first done!"<<std::endl;
+    }
+    else{
+        std::cout<<"first failure!"<<std::endl;
+    }
+
+    ret=s.insert(10);
+    if(ret.second){
+        std::cout<<"second done!"<<std::endl;
+    }
+    else{
+        std::cout<<"second failure!"<<std::endl;
+    }
+
+    std::multiset<int> ms;
+    ms.insert(6);
+    ms.insert(6);
+    for(std::multiset<int>::const_iterator it=ms.begin();it!=ms.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+```
+
+
+### 2. map
 
 去重类问题，可以打乱重新排列的问题，有清晰的一对一关系的问题
 
@@ -339,7 +480,8 @@ pair类模板
 
 1）构造
 
-    map<T1,T2> mp;
+    map<T1,T2> mp;默认构造为从小到大
+    map<T1,T2,compare> mp
 
 2）遍历
 
@@ -353,7 +495,7 @@ pair类模板
     	 //.insert(make_pair(10,10))
     	 //.insert(map<int,int>::value_type(10,2)); 
     	 //m[key] = value;   //m只能是map容器，不适用于multimap
-    .erase(elem)
+    .erase(pos)
     .erase(key) //删除key元素
 
 4）排序
@@ -361,64 +503,49 @@ pair类模板
     默认规则为按照key值从小到大排列，即key-value中的前一个元素
     如果是map中由自定义类型，则必须指定排序规则
 
-5) 查找与统计
+```
+class MyMapCompare
+{
+public:
+    bool operator()(int m,int n)
+    {
+        return m>n;
+    }
+};
+void testMap()
+{
+    std::map<int,int,MyMapCompare> m;
+    m.insert(std::make_pair(1,11));
+    m.insert(std::make_pair(2,10));
+    m.insert(std::make_pair(3,9));
+
+    for(std::map<int,int>::const_iterator it=m.begin();it!=m.end();it++)
+    {
+        std::cout<<"key:"<<it->first<<" val:"<<it->second<<std::endl;
+    }
+}
+```
+
+
+
+5）大小操作
+
+	.size()
+
+6）查找与统计
 
     .find()//查找key是否存在，若存在，返回该键的元素的迭代器，若不存在，返回.end()
     .count()
 
-### 2. set
 
-构造set集合的主要目的是为了快速检索,去重与排序
-set存储的是一组无重复的元素，而multiset允许存储有重复的元素;
-如果要修改某一个元素值，必须先删除原有的元素，再插入新的元素。
-
-1）构造
-
-	(1) set<int> s1;
-	(2) set<int,op> s2;  op为排序规则
-
-2）遍历
-
-    迭代器不支持随机访问
-
-3）插入/删除
-
-    .insert(elem)  set的insert返回值为一个pair<set<int>::iterator,bool>。
-               bool标志着插入是否成功，而iterator代表插入的位置，
-               若该键值已经在set中，则iterator表示已存在的该键值在set中的位置。插入数据后自动排序
-    .erase(elem)
-    .erase(pos)
-
-4）排序
-
-    set容器默认排序为从小到大
-    通过函数或仿函数自定义排序,必须在创建容器时定义set<int,MyCompare>
-
-定义比较函数（或比较类/结构体）
-     set容器在判定已有元素a和新插入元素b是否相等时，是这么做的：
-    （1）将a作为左操作数，b作为右操作数，调用比较函数，并返回比较值 ；
-    （2）将b作为左操作数，a作为右操作数，再调用一次比较函数，并返回比较值。
-     也就是说，假设有比较函数f(x,y)，要对已有元素a和新插入元素b进行比较时，会先进行f(a,b)操作，再进行f(b,a)操作，然后返回两个bool值。
-    如果1、2两步的返回值都是false，则认为a、b是相等的，则b不会被插入set容器中；
-    如果1返回true而2返回false，那么认为b要排在a的后面，反之则b要排在a的前面；
-    如果1、2两步的返回值都是true，则可能发生未知行为。
-
-
-
-5) 查找与统计
-
-    find(key) //查找key是否存在，若存在，返回该键的元素的迭代器，若不存在，返回set.end();
-    count(key) //统计key的元素个数
-
-
-3. multimap
+### 3. multimap
 
 1）构造
 2）遍历
 3）插入/删除
 4）排序
 
-4. multiset
+### 4. multiset
 
 1）构造
 2）遍历
@@ -432,22 +559,49 @@ set存储的是一组无重复的元素，而multiset允许存储有重复的元
 
 ### 1. stack
 
+                                   push()
+              **--**--**--**--**--**           top()
+                                   pop()
+           栈底                                               栈顶
+    
+    先进后出（First in Last Out）FILO
+
 1）构造
+
+    stack<T> stk;
+
 2）遍历
+
+    只有顶端的元素可以被外界使用，因为不允许遍历
+
 3）插入/删除
-.pop();
-.top();
-.push();
+
+    .pop();
+    .top();
+    .push();
 
 4）排序
+
+    无
+
+5）大小操作
+
+    .size()
+    .empty()
 
 ### 2. queue
 
       front->  **---**---**---**---   <-back
         pop->                         <-push
+    
+    先进先出，First in First Out, FIFO
 
 1）构造
+
 2）遍历
+
+    同stack，不允许由遍历行为
+
 3）插入/删除
 
     .front();
@@ -464,6 +618,7 @@ set存储的是一组无重复的元素，而multiset允许存储有重复的元
 
 1）构造
 
+```
 priority_queue<Type, Container, Functional>
 	Type 就是数据类型，
 	Container 就是容器类型。Container必须是用数组实现的容器，比如vector,deque等等，但不能用 list。STL里面默认用的是vector）
@@ -471,9 +626,12 @@ priority_queue<Type, Container, Functional>
 
 升序队列（小顶堆） priority_queue<int,vector<int>,greater<int>> q  
 降序队列（大顶堆） priority_queue<int,vector<int>,less<int>> q   等价于默认  priority_queue<int> q
+```
 
 2）遍历
+
 3）插入/删除
+
 4）排序
 
 ```
