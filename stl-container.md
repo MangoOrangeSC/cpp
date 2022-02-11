@@ -18,10 +18,12 @@ STL提供了三个序列式容器：向量（vector）、双端队列（deque）
 ### 1. vector
 
 单端数组
+```
                                            push_back()
      front()     **--**--**--**--**--**    back()
                                            pop_back()
     v.rend()/v.begin()                     v.end()/v.rbegin()
+```
 
 1）构造
 	
@@ -559,11 +561,13 @@ void testMap()
 
 ### 1. stack
 
+```
                                    push()
               **--**--**--**--**--**           top()
                                    pop()
            栈底                                               栈顶
-    
+```
+
     先进后出（First in Last Out）FILO
 
 1）构造
