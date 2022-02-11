@@ -48,10 +48,11 @@ STL提供了三个序列式容器：向量（vector）、双端队列（deque）
    中间插入元素效率较低！
 
    1）构造
+
 	(1) deque<int> d1;
 	(2) deque<int> d2(10);
 	(3) deque<int> d3(n,num);
-	
+
    2）遍历
 
 	容器支持随机访问d[n]
@@ -101,16 +102,17 @@ STL提供了三个序列式容器：向量（vector）、双端队列（deque）
     list.reverse();//反转链表
     可通过函数或仿函数自定义排序
 
-4. forward_list
+### 4. forward_list
 
-5. array
-6. string
-   
+### 5. array
+
+### 6. string
+
    Notes: 对于char型赋值，如果不加''，赋的是ascii
    example:char i=1 and char i='1'，后者才是真正的字符1
-   
+
    1）构造
-   
+
     string s1();  // si = ""
     string s2("Hello");  // s2 = "Hello"
     string s3(4, 'K');  // s3 = "KKKK"
