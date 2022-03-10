@@ -899,7 +899,7 @@ int main() {
 	int a = 10;
 	int b = 20;
 	int c = 0;
-	c = a > b ? a : b;
+	c = (a > b ? a : b);
 	cout << "c = " << c << endl;
 	//C++中三目运算符返回的是变量,可以继续赋值
 	(a > b ? a : b) = 100;
@@ -927,10 +927,10 @@ int main() {
 **语法：**
 
 ```C++
-switch(表达式)
+switch(表达式)   //表达式只能为整型或字符型，不可以是区间
 {
-	case 结果1：执行语句;break;
-	case 结果2：执行语句;break;
+	case 结果1：执行语句;break;  //若不加break，会继续执行后面的
+	case 结果2：执行语句;break;  //执行语句若为多行，必须加{}
 	...
 	default:执行语句;break;
 }
@@ -959,7 +959,7 @@ int main() {
 	case 10:
 	case 9:
 		cout << "经典" << endl;
-		break;
+		break;   //退出当前分支
 	case 8:
 		cout << "非常好" << endl;
 		break;
