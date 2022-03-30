@@ -1377,8 +1377,18 @@ int main() {
 }
 ```
 
+1. 括号法 
+Person p(10);
 
+2. 显示法
+Person p=Person(10);
 
+3. 隐示转换法（只有一个参数的构造函数）
+Person p=10;
+
+4. explict关键字：即3无效
+explict只能用于修饰只有一个参数的类构造函数，它的作用是表明该构造函数是显示的，而非隐示的，跟它相对的是implict，即隐式的，类构造函数默认声明为implict
+构造函数参数》=2,无法发生隐式转换，explict失效
 
 
 
@@ -1480,7 +1490,7 @@ int main() {
 
 2．默认析构函数(无参，函数体为空)
 
-3．默认拷贝构造函数，对属性进行值拷贝
+3．默认拷贝构造函数，对属性进行**值拷贝**
 
 
 
@@ -1574,10 +1584,168 @@ int main() {
 
 深拷贝：在堆区重新申请空间，进行拷贝操作
 
+**示例1：**
+
+```C++
+class Person {
+public:
+	//无参（默认）构造函数
+	Person() {
+		cout << "无参构造函数!" << endl;
+	}
+	//有参构造函数
+	Person(int age ) {	
+		cout << "有参构造函数!" << endl;
+		m_age = age;	
+	}
+
+	//析构函数
+	~Person() {
+		cout << "析构函数!" << endl;
+	}
+public:
+	int m_age;
+};
+
+void test01()
+{
+	Person p1(18, 180);
+
+	Person p2(p1);  //括号法调用拷贝构造
+
+	cout << "p1的年龄： " << p1.m_age  << endl;
+
+	cout << "p2的年龄： " << p2.m_age << endl;
+}
+
+int main() {
+
+	test01();
+
+	system("pause");
+
+	return 0;
+}
+```
 
 
-**示例：**
+**示例2：**
+增加堆区的成员变量
+但此时在析构函数中没有delete操作，所以此时不报错
+```C++
+class Person {
+public:
+	//无参（默认）构造函数
+	Person() {
+		cout << "无参构造函数!" << endl;
+	}
+	//有参构造函数
+	Person(int age ,int height) {
+		
+		cout << "有参构造函数!" << endl;
 
+		m_age = age;
+		m_height = new int(height);
+		
+	}
+	//析构函数
+	~Person() {
+		cout << "析构函数!" << endl;
+	}
+public:
+	int m_age;
+	int* m_height;
+};
+
+void test01()
+{
+	Person p1(18, 180);
+
+	Person p2(p1);
+
+	cout << "p1的年龄： " << p1.m_age << " 身高： " << *p1.m_height << endl;
+
+	cout << "p2的年龄： " << p2.m_age << " 身高： " << *p2.m_height << endl;
+}
+
+int main() {
+
+	test01();
+
+	system("pause");
+
+	return 0;
+}
+```
+
+**示例3：**
+增加析够，此时报错了
+```C++
+class Person {
+public:
+	//无参（默认）构造函数
+	Person() {
+		cout << "无参构造函数!" << endl;
+	}
+	//有参构造函数
+	Person(int age ,int height) {
+		
+		cout << "有参构造函数!" << endl;
+
+		m_age = age;
+		m_height = new int(height);
+		
+	}
+
+	//析构函数
+	~Person() {
+		cout << "析构函数!" << endl;
+		if (m_height != NULL)
+		{
+			delete m_height;
+			m_height=NULL;
+		}
+	}
+public:
+	int m_age;
+	int* m_height;
+};
+
+void test01()
+{
+	Person p1(18, 180);
+
+	Person p2(p1);
+
+	cout << "p1的年龄： " << p1.m_age << " 身高： " << *p1.m_height << endl;
+
+	cout << "p2的年龄： " << p2.m_age << " 身高： " << *p2.m_height << endl;
+}
+
+int main() {
+
+	test01();
+
+	system("pause");
+
+	return 0;
+}
+```
+
+
+
+|p1||p2|
+|----|----|----|
+|int m_age|Person p2(p1)|int m_age|
+|18|如果利用编译器提供的拷贝构造，做前拷贝，直接逐字复制|18|
+|int* m_Height|堆区|int* m_Height|
+|0x0011|0x0011  160|0x0011|
+|p1后被释放，再次释放堆区内存，出现错误|浅拷贝带来的问题就是堆区内存重复释放|p2先被释放，将堆区释放，此时没问题|
+||浅拷贝的问题要通过深拷贝来解决||
+||0x0022 160|int* m_Height|
+
+**示例4：**
+提供拷贝构造
 ```C++
 class Person {
 public:
@@ -1599,6 +1767,8 @@ public:
 		cout << "拷贝构造函数!" << endl;
 		//如果不利用深拷贝在堆区创建新内存，会导致浅拷贝带来的重复释放堆区问题
 		m_age = p.m_age;
+		//这一句为编译器提供
+		//m_Height=p.m_Height;
 		m_height = new int(*p.m_height);
 		
 	}
@@ -1700,8 +1870,109 @@ int main() {
 ```
 
 
+> 初始化列表性能好，推荐使用
+> 必须使用初始化列表的时候：
+> 1）常量成员const
+> 2）引用 。以上两种均为只可以初始化不可以赋值的情况
+> 3）没有默认构造函数的类（自定义）类型：直接调用拷贝构造
 
+> 构造函数执行其实是分为两个阶段的：1）初始化阶段；2）普通的计算阶段阶段。
+> 初始化阶段：所有类类型（class type）的成员都会在初始化阶段初始化，即使该成员没有出现在构造函数的初始化列表中。计算阶段：一般用于执行构造函数体内的赋值操作
+> 1)初始化阶段:初始化列表中显示初始化的成员按照列表中圆括号内的值初始化，而对于初始化列表中没有显式列出的成员，若是类成员，则调用该类型的默认构造函数初始化，若是内置类型或者复合类型，则按照变量初始化的原则，在局部作用域中的不做初始化，全局作用于中的初始化为0。
+> 2)普通的计算阶段：一般是指在构造函数的函数体内对数据成员做赋值工作，千万记住，在函数体内进行赋值操作之前，数据成员的初始化已经完成。
 
+https://blog.csdn.net/weixin_34260991/article/details/92153995
+
+    使用常规构造函数赋值类对象：
+```
+#include <iostream>
+using namespace std; 
+ 
+class Test_A
+{
+public:
+	Test_A()
+	{
+		cout<<"构造函数Test_A()"<<endl;
+	}
+ 
+	Test_A(const Test_A& t1)
+	{
+		cout<<"拷贝构造函数Test_A()"<<endl;
+		m_age = t1.m_age;
+	}
+ 
+	Test_A& operator = (const Test_A& t1)
+	{
+		cout<<"重载赋值运算符operator="<<endl;
+		m_age = t1.m_age;
+		return *this;
+	}
+ 
+	~Test_A()
+	{
+		cout<<"析构函数~Test_A()"<<endl;
+	}
+public:
+	int m_age;
+};
+ 
+class Test_B
+{
+public:
+	Test_B(Test_A& t1)
+	{
+		m_b = t1;
+	}
+public:
+	Test_A m_b;
+};
+ 
+/*此函数相当于一个舞台，展示此函数内对象的完整生命周期*/
+void display() 
+{
+	Test_A t1;
+	Test_B t2(t1);
+}
+ 
+int main()
+{
+	display();
+	system("pause");
+	return 0;
+}
+```
+
+    输出结果：
+```
+构造函数Test_A()
+构造函数Test_A()
+重载赋值运算符operator=
+析构函数~Test_A()
+析构函数~Test_A()
+```
+从输出结果中可以看出，在执行Test_B t2(t1)的过程：
+先调用Test_A类的构造函数初始化成员对象 m_b                             （初始化阶段）
+然后再调用Test_A类的重载赋值运算符函数，将t1赋值给m_b。    （计算阶段）
+
+    使用初始化列表（只需修改类Test_B中的构造函数）：
+```
+class Test_B
+{
+public:
+	Test_B(Test_A& t1):m_b(t1){};   //使用了构造函数的初始化列表
+public:
+	Test_A m_b;
+};
+```
+
+        输出结果：
+```
+构造函数Test_A()
+拷贝构造函数Test_A()
+析构函数~Test_A()
+析构函数~Test_A()
+```
 
 #### 4.2.7 类对象作为类成员
 
