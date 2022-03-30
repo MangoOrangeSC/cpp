@@ -2628,8 +2628,8 @@ this指针不需要定义，直接使用即可
 
 this指针的用途：
 
-*  当形参和成员变量同名时，可用this指针来区分
-*  在类的非静态成员函数中返回对象本身，可使用return *this
+*  当形参和成员变量同名时，可用this指针来区分  （解决名称冲突）
+*  在类的非静态成员函数中返回对象本身，可使用return *this （链式编程。返回对象本身，this指针指向被调用的成员函数所属的对象）
 
 ```C++
 class Person
@@ -2645,7 +2645,7 @@ public:
 	Person& PersonAddPerson(Person p)
 	{
 		this->age += p.age;
-		//返回对象本身
+		//this指向p2的指针，*this返回对象本身
 		return *this;
 	}
 
@@ -2658,6 +2658,12 @@ void test01()
 	cout << "p1.age = " << p1.age << endl;
 
 	Person p2(10);
+	
+	//链式编程思想
+	//如果上面返回的不是Person& 而是Person，输出为20
+	//如果返回值为Person类型，即值传递，那么会调用拷贝构造
+             返回p2`               返回p2``             返回p2```
+   (             |	     )                    )                   )
 	p2.PersonAddPerson(p1).PersonAddPerson(p1).PersonAddPerson(p1);
 	cout << "p2.age = " << p2.age << endl;
 }
@@ -2702,13 +2708,19 @@ public:
 	void ShowClassName() {
 		cout << "我是Person类!" << endl;
 	}
-
-	void ShowPerson() {
+	
+	//1.0
+	void ShowPersonAge() {
+		cout << mAge << endl;
+	}
+	//2.0
+	void ShowPersonAge() {
 		if (this == NULL) {
 			return;
 		}
 		cout << mAge << endl;
 	}
+
 
 public:
 	int mAge;
@@ -2719,6 +2731,7 @@ void test01()
 	Person * p = NULL;
 	p->ShowClassName(); //空指针，可以调用成员函数
 	p->ShowPerson();  //但是如果成员函数中用到了this指针，就不可以了
+					//属性前默认加了this指针，而this是空的，空的指针访问属性，必报错
 }
 
 int main() {
@@ -2755,6 +2768,7 @@ int main() {
 
 * 声明对象前加const称该对象为常对象
 * 常对象只能调用常函数
+* 成员属性声明时加关键字mutable后，常对象可以修改
 
 
 
@@ -2774,6 +2788,7 @@ public:
 
 	//this指针的本质是一个指针常量，指针的指向不可修改
 	//如果想让指针指向的值也不可以修改，需要声明常函数
+	//在成员函数后加const，修饰的是this指向，让指针指向的值也不可以修改
 	void ShowPerson() const {
 		//const Type* const pointer;
 		//this = NULL; //不能修改指针的指向 Person* const this;
@@ -2802,7 +2817,7 @@ void test01() {
 	person.m_B = 100; //但是常对象可以修改mutable修饰成员变量
 
 	//常对象访问成员函数
-	person.MyFunc(); //常对象不能调用const的函数
+	person.MyFunc(); //常对象不能调用非const的函数，因为普通成员函数可以修改属性
 
 }
 
@@ -2815,7 +2830,6 @@ int main() {
 	return 0;
 }
 ```
-
 
 
 
