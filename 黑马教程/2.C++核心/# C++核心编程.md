@@ -9,7 +9,7 @@
 C++程序在执行时，将内存大方向划分为**4个区域**
 
 - 代码区：存放函数体的二进制代码，由操作系统进行管理的
-- 全局区：存放全局变量和静态变量以及常量
+- 全局区：存放全局变量和静态变量（静态区）以及常量（常量区）
 - 栈区：由编译器自动分配释放, 存放函数的参数值,局部变量等
 - 堆区：由程序员分配和释放,若程序员不释放,程序结束时由操作系统回收
 
@@ -43,11 +43,12 @@ C++程序在执行时，将内存大方向划分为**4个区域**
 
 ​		全局变量和静态变量存放在此.
 
-​		全局区还包含了常量区, 字符串常量和其他常量也存放在此.
+​		全局区还包含了常量区, 字符串常量和其他常量（const）也存放在此.
 
 ​		==该区域的数据在程序结束后由操作系统释放==.
 
-
+不在全局区：局部变量；const修饰的局部变量（局部常量）
+常量区：全局变量；静态变量static；常量区（字符串常量，const修饰的全局变量）
 
 
 
@@ -140,18 +141,20 @@ int main() {
 **示例：**
 
 ```c++
-int * func()
+//栈区数据注意事项 --不要返回局部变量的地址
+//栈区的数据由编译器管理开辟和释放
+int * func()    //形参数据也放在栈区
 {
-	int a = 10;
-	return &a;
+	int a = 10;  //局部变量，存放在栈区，栈区数据在函数执行完后自动释放
+	return &a;   //返回局部变量的地址
 }
 
 int main() {
-
+	//接收fun函数的返回值
 	int *p = func();
 
-	cout << *p << endl;
-	cout << *p << endl;
+	cout << *p << endl;  //10  第一次可以打印正确，因为编译器做了保留
+	cout << *p << endl;  //输出乱码  第二次，数据不做保留
 
 	system("pause");
 
@@ -176,6 +179,9 @@ int main() {
 ```c++
 int* func()
 {
+	//利用new关键字，将数据开辟到堆区
+	//指针a仍是局部变量，放在栈上，指针保存的数据存放在堆区
+	//虽然函数运行完a被释放，但是a的值已经返回保存在了p中，所以可以正常运行
 	int* a = new int(10);
 	return a;
 }
@@ -184,8 +190,8 @@ int main() {
 
 	int *p = func();
 
-	cout << *p << endl;
-	cout << *p << endl;
+	cout << *p << endl;  //10
+	cout << *p << endl;  //10
     
 	system("pause");
 
@@ -440,43 +446,47 @@ int main() {
 
 
 
-注意：**不要返回局部变量引用**
+1.注意：**不要返回局部变量引用**
 
-用法：函数调用作为左值
+2.用法：函数调用作为左值
 
 
 
 **示例：**
 
 ```C++
-//返回局部变量引用
+//1.返回局部变量引用
 int& test01() {
-	int a = 10; //局部变量
+	int a = 10; //局部变量，存放在内存中的 栈区
 	return a;
 }
 
 //返回静态变量引用
+//2.函数的调用可以作为左值
 int& test02() {
-	static int a = 20;
+	static int a = 20; //存放在全局区，全局区上的数据在程序结束后系统释放
 	return a;
 }
 
 int main() {
 
 	//不能返回局部变量的引用
+	//想返回test01中的a
 	int& ref = test01();
-	cout << "ref = " << ref << endl;
-	cout << "ref = " << ref << endl;
+	cout << "ref = " << ref << endl; //返回10
+	cout << "ref = " << ref << endl; //返回乱码
 
 	//如果函数做左值，那么必须返回引用
 	int& ref2 = test02();
-	cout << "ref2 = " << ref2 << endl;
-	cout << "ref2 = " << ref2 << endl;
+	cout << "ref2 = " << ref2 << endl; //10
+	cout << "ref2 = " << ref2 << endl; //10
+	
+	//函数调用作为左值
+	test02() = 1000; //相当于a=1000
+						//如果函数的返回值是引用，这个函数调用可以作为左值
 
-	test02() = 1000;
-
-	cout << "ref2 = " << ref2 << endl;
-	cout << "ref2 = " << ref2 << endl;
+	cout << "ref2 = " << ref2 << endl;  //1000
+	cout << "ref2 = " << ref2 << endl;  //1000
 
 	system("pause");
 
@@ -3191,6 +3201,9 @@ int main() {
 
 ```C++
 class Person {
+	//如果成员属性是public，不需要该友元操作
+	//但一般成员属性都为private，所以为了让成员函数访问private属性
+	//定义友元
 	friend ostream& operator<<(ostream& out, Person& p);
 
 public:
@@ -3201,7 +3214,10 @@ public:
 		this->m_B = b;
 	}
 
-	//成员函数 实现不了  p << cout 不是我们想要的效果
+	//成员函数：p.operator<<(p) 或者p.operator<<(cout)
+    //简化为  p << cout 不是我们想要的效果
+    //所以一般不利用成员函数重载左移运算符
+    //用全局函数来重载
 	//void operator<<(Person& p){
 	//}
 
@@ -3210,8 +3226,14 @@ private:
 	int m_B;
 };
 
-//全局函数实现左移重载
-//ostream对象只能有一个
+//只能用全局函数实现左移重载
+//ostream对象:标准输出流对象，全局只能有一个
+//本质 operator<<(cout , p) 简化为cout<<p
+void operator<<(ostream& out, Person& p) {
+	out << "a:" << p.m_A << " b:" << p.m_B;
+}
+//上面已经可以单独输出了，但不能连续输出
+//想链式编程，得返回引用
 ostream& operator<<(ostream& out, Person& p) {
 	out << "a:" << p.m_A << " b:" << p.m_B;
 	return out;
@@ -3256,6 +3278,15 @@ int main() {
 
 作用： 通过重载递增运算符，实现自己的整型数据
 
+递增运算符++
+int a=10;
+
+cout<<++a; 11
+cout<<a; 11
+
+int b=10;
+cout<<b++; 10
+cout<<b; 11
 
 
 ```C++
@@ -3268,19 +3299,38 @@ public:
 	MyInteger() {
 		m_Num = 0;
 	}
-	//前置++
+	
+	//1.重载前置递增++
+	//返回引用，为了对一个数据进行操作
 	MyInteger& operator++() {
 		//先++
 		m_Num++;
-		//再返回
+		//再返回自身
 		return *this;
 	}
 
-	//后置++
-	MyInteger operator++(int) {
-		//先返回
-		MyInteger temp = *this; //记录当前本身的值，然后让本身的值加1，但是返回的是以前的值，达到先返回后++；
+	//返回值：不能链式编程
+	MyInteger operator++() {
+		//先++
 		m_Num++;
+		//再返回自身
+		return *this;
+	}
+	myint=0;
+	cout<< ++(++myint) << endl; //2
+	cout<< myint <<endl;   //1
+
+
+	//2.后置递增++
+	//int代表占位参数，可以用于区分前置和后置递增
+	//此处一定要返回值，如果返回引用，那么就返回了局部变量的引用，为非法操作
+	MyInteger operator++(int) {
+		//先返回，然后表达式运算
+		//先记录当时结果
+		MyInteger temp = *this; 
+		//后 递增运算
+		m_Num++;
+		//最后将记录的结果返回
 		return temp;
 	}
 
@@ -3358,7 +3408,7 @@ c++编译器至少给一个类添加4个函数
 
 
 
-**示例：**
+**示例1：**
 
 ```C++
 class Person
@@ -3371,16 +3421,105 @@ public:
 		m_Age = new int(age);
 	}
 
-	//重载赋值运算符 
-	Person& operator=(Person &p)
+	//年龄的指针
+	int *m_Age;
+
+};
+
+
+void test01()
+{
+	Person p1(18);
+
+	Person p2(20);
+
+
+	p2 = p1; //赋值操作
+
+	cout << "p1的年龄为：" << *p1.m_Age << endl; //18
+
+	cout << "p2的年龄为：" << *p2.m_Age << endl; //18
+
+
+}
+
+
+```
+
+加上析构函数以后，崩溃
+**示例2：**
+```C++
+class Person
+{
+public:
+
+	Person(int age)
+	{
+		//将年龄数据开辟到堆区
+		m_Age = new int(age);
+	}
+
+
+	~Person()
 	{
 		if (m_Age != NULL)
 		{
 			delete m_Age;
 			m_Age = NULL;
 		}
+	}
+
+	//年龄的指针
+	int *m_Age;
+
+};
+
+
+void test01()
+{
+	Person p1(18);
+
+	Person p2(20);
+
+
+	p2 = p1; //赋值操作
+
+	cout << "p1的年龄为：" << *p1.m_Age << endl;
+
+	cout << "p2的年龄为：" << *p2.m_Age << endl;
+
+}
+
+```
+
+
+利用深拷贝解决上述问题
+**示例3：**
+```C++
+class Person
+{
+public:
+
+	Person(int age)
+	{
+		//将年龄数据开辟到堆区
+		m_Age = new int(age);
+	}
+
+	//重载赋值运算符 
+	//返回值为void，功能有，但不能连等
+	//要链式编程，必须返回自身引用
+	Person& operator=(Person &p)
+	{
 		//编译器提供的代码是浅拷贝
 		//m_Age = p.m_Age;
+
+		//先判断是否有属性在堆区，如果有先释放干净，然后在深拷贝
+		if (m_Age != NULL)
+		{
+			delete m_Age;
+			m_Age = NULL;
+		}
 
 		//提供深拷贝 解决浅拷贝的问题
 		m_Age = new int(*p.m_Age);
@@ -3431,9 +3570,9 @@ int main() {
 	//int c = 30;
 
 	//c = b = a;
-	//cout << "a = " << a << endl;
-	//cout << "b = " << b << endl;
-	//cout << "c = " << c << endl;
+	//cout << "a = " << a << endl; //10
+	//cout << "b = " << b << endl; //10
+	//cout << "c = " << c << endl; //10
 
 	system("pause");
 
@@ -3569,6 +3708,7 @@ void test01()
 }
 
 
+//仿函数非常灵活，没有固定写法
 class MyAdd
 {
 public:
@@ -3584,7 +3724,7 @@ void test02()
 	int ret = add(10, 10);
 	cout << "ret = " << ret << endl;
 
-	//匿名对象调用  
+	//匿名函数对象调用  
 	cout << "MyAdd()(100,100) = " << MyAdd()(100, 100) << endl;
 }
 
