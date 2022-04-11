@@ -48,7 +48,7 @@ C++程序在执行时，将内存大方向划分为**4个区域**
 ​		==该区域的数据在程序结束后由操作系统释放==.
 
 不在全局区：局部变量；const修饰的局部变量（局部常量）
-常量区：全局变量；静态变量static；常量区（字符串常量，const修饰的全局变量）
+全局区：全局变量；静态变量static；常量区（字符串常量，const修饰的全局变量）
 
 
 
@@ -4011,7 +4011,7 @@ B 类称为父类 或 基类
 **继承方式一共有三种：**
 
 * 公共继承
-* 保护继承
+* 保护继承：类内可见，类外不可见，同private，但想让后类见
 * 私有继承
 
 
@@ -4020,7 +4020,28 @@ B 类称为父类 或 基类
 
 ![img](assets/clip_image002.png)
 
+class A 
+public: int a
+protected: int b;
+private: int c;
 
+公有继承
+class B : public A
+public: int a
+protected: int b;
+不可访问: int c;
+
+保护继承
+class C : protected A
+protected: int a
+protected: int b;
+不可访问: int c;
+
+私有继承
+class D : private A
+private: int a
+private: int b;
+不可访问: int c;
 
 
 
@@ -4043,8 +4064,8 @@ class Son1 :public Base1
 public:
 	void func()
 	{
-		m_A; //可访问 public权限
-		m_B; //可访问 protected权限
+		m_A; //可访问 仍为public权限
+		m_B; //可访问 仍为protected权限
 		//m_C; //不可访问
 	}
 };
@@ -4070,8 +4091,8 @@ class Son2:protected Base2
 public:
 	void func()
 	{
-		m_A; //可访问 protected权限
-		m_B; //可访问 protected权限
+		m_A; //可访问 变为protected权限
+		m_B; //可访问 变为protected权限
 		//m_C; //不可访问
 	}
 };
@@ -4152,7 +4173,9 @@ public:
 
 void test01()
 {
-	cout << "sizeof Son = " << sizeof(Son) << endl;
+	//父类中所有的非静态成员属性都会被子类继承下去
+	//父类中的私有成员属性 是被编译器隐藏了，因此是访问不到，但是确实被继承下去了
+	cout << "sizeof Son = " << sizeof(Son) << endl; //16=4*4；A,B,C,D
 }
 
 int main() {
@@ -4191,7 +4214,8 @@ int main() {
 
 
 
-> 结论： 父类中私有成员也是被子类继承下去了，只是由编译器给隐藏后访问不到
+> 结论：父类中所有的非静态成员属性都会被子类继承下去
+>  父类中私有成员也是被子类继承下去了，只是由编译器给隐藏后访问不到
 
 
 
@@ -4365,6 +4389,7 @@ int main() {
 1. 子类对象可以直接访问到子类中同名成员
 2. 子类对象加作用域可以访问到父类同名成员
 3. 当子类与父类拥有同名的成员函数，子类会隐藏父类中同名成员函数，加作用域可以访问到父类中同名函数
+4. 补充：哪怕是函数重载后，只有父类中的成员函数满足调用条件，只要不加作用域，也同样无法调用
 
 
 
