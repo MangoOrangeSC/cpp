@@ -24,7 +24,7 @@
 0x0000       10
 a
 
-#### 1.3.1 变量定义（define）
+####  变量定义（define）
   * **定义形式**：类型说明符（type specifier） + 一个或多个变量名组成的列表。如`int sum = 0, value, units_sold = 0;`
   * 初始化（initialize）：当对象创建时获得了一个特定的值，我们说这个对象被初始化了
 > 初始化与赋值是两个完全不同的操作。初始化的含义是创建变量的同时赋予其一个初始值，而赋值的含义是把对象的当前值擦除，而以一个新的值来代替
@@ -49,14 +49,72 @@ a
     * 内置类型：定义于任何函数体之外，初始化为0；函数体内部的内置类型变量不被初始化
     * 类的对象如果没有被显示初始化，其值由类决定
 
-#### 1.3.2 变量的声明（declaration）与定义(define)
+####  变量的声明（declaration）
   如果想声明一个变量而非定义它，就在前加extern
 ```
   extern int i; //声明i而非定义
   int j; //声明并定义j
 ```
 
-#### 1.3.3 名字的作用域
+> 变量能且只能被定义一次，但是可以被多次声明
+
+如果在多个文件中使用同一个变量，必须将声明与定义分离。变量的定义必须出现在且只能出现在一个文件中，其他用到该变量的文件必须对其进行声明，但绝不能重复定义。
+
+如果一个程序包含两个文件，在两个文件中都要用到同一个外部变量num，不能分别在两个文件中各自定义一个外部变量num。
+正确的做法是：在任一个文件中定义外部变量num，而在另一文件中用extern对num作外部变量声明。即extern int num;
+编译系统由此知道num是一个已在别处定义的外部变量，它先在本文件中找有无外部变量num，如果有，则将其作用域扩展到本行开始。
+
+> par.h
+```
+#ifndef PAR
+#define PAR
+
+int ii=60;
+
+#endif
+```
+> main.cc
+```
+#include <iostream>
+#include "par.h"
+
+extern int ii;  //将该句注释掉，程序也可以正常运行
+int main()
+{
+    std::cout<<ii<<std::endl;
+}
+```
+
+> par.h
+```
+#ifndef PAR
+#define PAR
+
+//int ii=60;
+extern int ii;
+#endif
+```
+> par.cc
+```
+#include "par.h"
+
+//extern int ii;
+int ii=60;
+```
+> main.cc
+```
+#include <iostream>
+#include "par.h"
+
+extern int ii;
+int main()
+{
+    std::cout<<ii<<std::endl;
+}
+```
+
+
+####  名字的作用域
 作用域scope是程序的一部分。以花括号分隔
   * 嵌套的作用域
     内层作用域与外层作用域
@@ -415,9 +473,14 @@ int main(){
   - 转义序列。`\n`、`\t`等。
   - 指定字面值的类型
   	- 字符和字符串字面值
+  		- u : char16_t
+  		- U : char32_t
+  		- L : wchar_t
+  		- u8 : char 
   	- 整型字面值
   		- u or U : unsigned
-        - l or L : long
+  		- l or L : long
+  		- ll or LL : long long
     - 浮点型字面值
     	- f or F : float
     	- l or L : long double 
@@ -426,7 +489,123 @@ int main(){
 
 > 字符串型实际上时常量字符构成的数组，结尾处以`'\0'`结束，所以字符串类型实际上长度比内容多1。
 
-## 3 运算符
+
+
+
+### const限定符
+
+- 动机：希望定义一些不能被改变值的变量。
+
+#### 1 初始化和const
+
+- const对象**必须初始化**，且**不能被改变**。
+- 默认情况下，const对象被设定为仅在文件内有效。多个文件出现了同名const，等于在不同文件中分别定义了独立变量。const变量默认不能被其他文件访问，非要访问，必须在指定const定义之前加extern。要想在多个文件中使用const变量共享，定义和声明都加const关键字即可。
+
+#### 2 const的引用
+
+- **reference to const**（对常量的引用）：指向const对象的引用，如 `const int ival=1; const int &refVal = ival;`，可以读取但不能修改`refVal`。
+	- “对const的引用”简称为“常量引用”。只是个简称而已。严格来说，并不存在常量引用 
+- 引用的类型必须与其所引用的对象的类型一致。第一种例外情况就是 初始化常量引用时允许用任意表达式作为初始值。code1
+	- 理解当一个常量引用被绑定到另外一种类型上时到底发生了什么。code2
+		- 编译器创建了临时量对象
+		- 如果ri不是const，如果仍然执行以上操作结果如何？如果ri为非const，则允许对ri赋值，会改变ri所引用的对象的值。但此时ri绑定在临时量上，所以此种行为没有意义，c++将其视为非法，会报错！！！！
+> code1
+```code1
+	int i=42; 
+	const int &r1=i;
+	const int &r2=42; 
+	const int &r3=r1*2
+	int &r4=r1*2;//错误，r4是非常量引用
+```
+
+> code2
+```
+double dv=3.14;
+const int &ri=dv;
+
+>>>>>>>>>>
+
+const int temp=dv;
+const int &ri=temp;
+```
+
+- 对const的引用可能引用一个非const对象：常量引用仅对引用可参与的操作做出了限定，对于引用本身是不是一个常量未作限定。
+
+```
+    int i=42;
+    int &r1=i;
+    const int &r2=i;
+    std::cout<<i<<","<<r1<<","<<r2<<std::endl; //42 42 42
+
+    r1=0;
+    std::cout<<i<<","<<r1<<","<<r2<<std::endl; //0 0 0
+```
+> 下面的例子与临时量对象有关
+```
+    double j=42.66;
+    const int &r3=j;
+    //const int &r2=i;
+    std::cout<<j<<","<<r3<<","<<std::endl; //42.66 42
+
+    j=44.66;
+    std::cout<<j<<","<<r3<<","<<std::endl; //44.66 42 
+```
+
+#### 3 指针和const
+
+- **pointer to const**（指向常量的指针）：不能用于改变其所指对象的值, 如 `const double pi = 3.14; const double *cptr = &pi;`。
+	- 与引用类似，指针的类型必须与所指向对象类型一致，一种例外情况就是允许令一个指向常量的指针指向一个非常量对象
+	- double dv=3.14; const double *cp=&dv;//正确，只是不能通过指针修改dv的值 
+- **const pointer**：指针本身是常量，也就是说指针固定指向该对象，（存放在指针中的地址不变，地址所对应的那个对象值可以修改）如 `int i = 0; int *const ptr = &i;`
+
+#### 4 顶层const
+
+- `顶层const`：指针本身是个常量。
+- `底层const`：指针指向的对象是个常量。拷贝时严格要求相同的底层const资格。
+
+#### 5 `constexpr`和常量表达式（▲可选）
+
+- 常量表达式：指值不会改变，且在编译过程中就能得到计算结果的表达式。
+- `C++11`新标准规定，允许将变量声明为`constexpr`类型以便由编译器来验证变量的值是否是一个常量的表达式。
+
+
+### 处理类型
+
+#### 类型别名
+
+- 传统别名：使用**typedef**来定义类型的同义词。 `typedef double wages;`
+- 新标准别名：别名声明（alias declaration）： `using SI = Sales_item;`（C++11）
+
+```cpp
+// 对于复合类型（指针等）不能代回原式来进行理解
+typedef char *pstring;  // pstring是char*的别名
+const pstring cstr = 0; // 指向char的常量指针
+// 如改写为const char *cstr = 0;不正确，为指向const char的指针
+
+// 辅助理解（可代回后加括号）
+// const pstring cstr = 0;代回后const (char *) cstr = 0;
+// const char *cstr = 0;即为(const char *) cstr = 0;
+```
+
+#### auto类型说明符 c++11
+
+- **auto**类型说明符：让编译器**自动推断类型**。
+- 一条声明语句只能有一个数据类型，所以一个auto声明多个变量时只能相同的变量类型(包括复杂类型&和*)。`auto sz = 0, pi =3.14//错误`
+- `int i = 0, &r = i; auto a = r;` 推断`a`的类型是`int`。
+- 会忽略`顶层const`。
+- `const int ci = 1; const auto f = ci;`推断类型是`int`，如果希望是顶层const需要自己加`const`
+
+#### decltype类型指示符
+
+- 从表达式的类型推断出要定义的变量的类型。
+- **decltype**：选择并返回操作数的**数据类型**。
+- `decltype(f()) sum = x;` 推断`sum`的类型是函数`f`的返回类型。
+- 不会忽略`顶层const`。
+- 如果对变量加括号，编译器会将其认为是一个表达式，如int i-->(i),则decltype((i))得到结果为int&引用。
+- 赋值是会产生引用的一类典型表达式，引用的类型就是左值的类型。也就是说，如果 i 是 int，则表达式 i=x 的类型是 int&。
+- `C++11`
+
+## 3 运算符/表达式
 
 **作用：**用于执行代码的运算
 
@@ -448,7 +627,8 @@ int main(){
     - C中原意：左值**可以**在表达式左边，右值不能。
     - `C++`：当一个对象被用作**右值**的时候，用的是对象的**值**（内容）；
     - 被用做**左值**时，用的是对象的**身份**（在内存中的位置）。
-- **求值顺序**：`int i = f1() + f2()`
+- **优先级与结合律**
+- - **求值顺序**：`int i = f1() + f2()`
   - 先计算`f1() + f2()`,再计算`int i = f1() + f2()`。但是f1和f2的计算**先后不确定**
   - 但是，如果f1、f2都对同一对象进行了修改，因为顺序不确定，所以会编译出错，显示未定义
   - 有4中运算符明确规定了运算对象的求值顺序
@@ -865,7 +1045,7 @@ bool stu12 = quiz1 & (1UL << 12);   // 判断第12个学生是否通过
 
 ##### 1.1 算术转换
 算术转换的含义是把一种算术类型转换成另外一种算术类型。前文数据类型中已经提到
-###### 整型提升
+- 整型提升
 
 * 常见的char、bool、short能存在int就会转换成int，否则提升为`unsigned int`
 * `wchar_t,char16_t,char32_t`提升为整型中`int,long,long long ……`最小的，且能容纳原类型所有可能值的类型。
