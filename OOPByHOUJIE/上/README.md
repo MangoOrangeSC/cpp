@@ -98,7 +98,7 @@ cout是一个object，type是ostream
 
 
 
-编程示例
+### 编程示例
 
 ```
 #ifndef __MYCOMPLEX__
@@ -107,12 +107,12 @@ cout是一个object，type是ostream
 class complex
 {
 public:
-  complex (double r = 0, double i = 0): re (r), im (i) { }
+  complex (double r = 0, double i = 0): re (r), im (i) { }   //参数列表
   complex& operator += (const complex&);
   complex& operator -= (const complex&);
   complex& operator *= (const complex&);
   complex& operator /= (const complex&);
-  double real () const { return re; }
+  double real () const { return re; }       // 考虑const的问题  //inline
   double imag () const { return im; }
 private:
   double re, im;
@@ -127,3 +127,83 @@ private:
 
 ```
 
+class 外
+```
+
+inline complex&
+__doapl (complex* ths, const complex& r)
+{
+  ths->re += r.re;
+  ths->im += r.im;
+  return *ths;
+}
+
+
+inline complex&                          //reference
+complex::operator += (const complex& r)  //const
+{
+  return __doapl (this, r);
+}
+
+
+//如果设计在class里，只能有这一种，后面两种没法重载
+inline complex
+operator + (const complex& x, const complex& y)
+{
+  return complex (real (x) + real (y), imag (x) + imag (y)); //临时对象
+}
+
+inline complex
+operator + (const complex& x, double y)
+{
+  return complex (real (x) + y, imag (x));
+}
+
+inline complex
+operator + (double x, const complex& y)
+{
+  return complex (x + real (y), imag (y));
+}
+```
+
+
+
+![image1](pic/pic47.png)
+
+
+### string class
+![image1](pic/pic48.png)
+to do:
+
+s3=s2; //赋值
+
+
+
+### big three
+
+
+
+- data 是动态的，提前不能指定大小
+
+- 函数2：拷贝构造
+- 函数3：操作符重载：拷贝赋值
+- 函数4：析构函数
+- 函数5：inline
+
+![image1](pic/pic49.png)
+
+### ctor dtor
+
+strlen
+
+strcpy
+
+![image1](pic/pic50.png)
+![image1](pic/pic51.png)
+![image1](pic/pic52.png)
+![image1](pic/pic53.png)
+![image1](pic/pic54.png)
+![image1](pic/pic55.png)
+![image1](pic/pic56.png)
+![image1](pic/pic57.png)
+![image1](pic/pic58.png)
