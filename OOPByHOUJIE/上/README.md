@@ -62,15 +62,23 @@
 ![image1](pic/pic31.png)
 
 
-### 操作符重载
+### 操作符重载-1,成员函数
 
 ![image1](pic/pic32.png)
+
+### return by reference
 
 ![image1](pic/pic33.png)
 
 ![image1](pic/pic34.png)
 
+### 操作符重载-2，非成员函数
+
 ![image1](pic/pic35.png)
+
+不可以返回reference，这是一个临时量
+
+typename() 创建临时变量
 
 ![image1](pic/pic36.png)
 
@@ -78,4 +86,44 @@
 ![image1](pic/pic38.png)
 ![image1](pic/pic39.png)
 ![image1](pic/pic40.png)
-![image1](pic/pic.png)
+
+cout << 只能全局函数重载
+
+因为cout为标准库中的，不可能认识<<这个符号，所以只能写成全局函数重载
+
+cout是一个object，type是ostream
+
+重载时第一参数一定不能是const
+
+
+
+
+编程示例
+
+```
+#ifndef __MYCOMPLEX__
+#define __MYCOMPLEX__
+
+class complex
+{
+public:
+  complex (double r = 0, double i = 0): re (r), im (i) { }
+  complex& operator += (const complex&);
+  complex& operator -= (const complex&);
+  complex& operator *= (const complex&);
+  complex& operator /= (const complex&);
+  double real () const { return re; }
+  double imag () const { return im; }
+private:
+  double re, im;
+
+  friend complex& __doapl (complex *, const complex&);
+  friend complex& __doami (complex *, const complex&);
+  friend complex& __doaml (complex *, const complex&);
+};
+
+
+#endif   //__MYCOMPLEX__
+
+```
+
