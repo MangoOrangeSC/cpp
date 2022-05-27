@@ -199,11 +199,61 @@ strlen
 strcpy
 
 ![image1](pic/pic50.png)
+
+### class with pointer member必须有copy ctor  copy op=
+
+浅拷贝与深拷贝
+
 ![image1](pic/pic51.png)
+
+深拷贝
 ![image1](pic/pic52.png)
+
+### 拷贝赋值
+
+- 检测自我赋值（效率与安全）
+
+- 清空
+- 创建同样大小
+- 拷贝
+
+自我赋值：自己赋给自己。
+
 ![image1](pic/pic53.png)
+
+第一个动作：将自己kill
 ![image1](pic/pic54.png)
+第二个动作 分配空间
 ![image1](pic/pic55.png)
+第三个动作 深拷贝
 ![image1](pic/pic56.png)
+
+但是，如果是自己，直接就把唯一存在的杀掉了
 ![image1](pic/pic57.png)
+
+### output
 ![image1](pic/pic58.png)
+
+### 所谓stack 所谓heap
+![image1](pic/pic59.png)
+
+### stack objects的生命期
+![image1](pic/pic60.png)
+### static local objects的生命期
+![image1](pic/pic61.png)
+
+### global objects的生命期
+
+![image1](pic/pic62.png)
+
+### heap objects的生命期
+
+![image1](pic/pic63.png)
+![image1](pic/pic64.png)
+![image1](pic/pic65.png)
+![image1](pic/pic66.png)
+![image1](pic/pic67.png)
+![image1](pic/pic68.png)
+![image1](pic/pic69.png)
+![image1](pic/pic70.png)
+![image1](pic/pic.png)
