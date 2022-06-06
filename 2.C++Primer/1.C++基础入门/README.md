@@ -2634,7 +2634,7 @@ int main() {
 
 
 
-
+### ***************************
 
 
 
@@ -2722,7 +2722,11 @@ int main() {
 
 #### 可变形参
 
-`initializer_list`提供的操作（`C++11`）：
+为了编写能处理不同数量实参的函数，C++11提供了两种主要方法：initializer_list 与 可变参数模板 ，还有省略符
+
+1. `initializer_list`提供的操作（`C++11`）：
+
+实参数量未知但全部实参的类型相同。
 
 | 操作 | 解释 |
 |-----|-----|
@@ -2748,10 +2752,19 @@ err_msg(ErrCode(0), {"functionX", "okay});
 ```
 
 - 所有实参类型相同，可以使用 `initializer_list`的标准库类型。
-- 实参类型不同，可以使用`可变参数模板`。
+2. 实参类型不同，可以使用`可变参数模板`。
 - 省略形参符： `...`，便于`C++`访问某些C代码，这些C代码使用了 `varargs`的C标准功能。
 
-### 返回类型和return语句
+### 6.3返回类型和return语句
+
+return语句有两种形式
+
+```
+return;
+
+return expression;
+
+```
 
 #### 无返回值函数
 
@@ -2762,27 +2775,56 @@ err_msg(ErrCode(0), {"functionX", "okay});
 - `return`语句的返回值的类型必须和函数的返回类型相同，或者能够**隐式地**转换成函数的返回类型。
 - 值的返回：返回的值用于初始化调用点的一个**临时量**，该临时量就是函数调用的结果。
 - **不要返回局部对象的引用或指针**。
-- **引用返回左值**：函数的返回类型决定函数调用是否是左值。调用一个返回引用的函数得到左值；其他返回类型得到右值。
+- 返回类类型的函数和调用运算符
+- **引用返回左值**：函数的返回类型决定函数调用是否是左值。调用一个返回引用的函数得到左值；其他返回类型得到右值。可以像使用其他左值那样来使用**返回引用的函数的调用**，即能为返回类型是非常量引用的函数的结果赋值。
 - **列表初始化返回值**：函数可以返回花括号包围的值的列表。（`C++11`）
 - **主函数main的返回值**：如果结尾没有`return`，编译器将隐式地插入一条返回0的`return`语句。返回0代表执行成功。
 
 #### 返回数组指针
 
-- `Type (*function (parameter_list))[dimension]`
-- 使用类型别名： `typedef int arrT[10];` 或者 `using arrT = int[10;]`，然后 `arrT* func() {...}`
-- 使用 `decltype`： `decltype(odd) *arrPtr(int i) {...}`
+因为数组不能被拷贝，所以函数不能返回数组。可以返回数组的指针或引用
+
+```
+typedef int arrT[10]; //arrT是类型别名，它表示的类型是含有10个int的数组
+
+using arrT=int [10];  //arrT的等价声明
+
+arrT* func(int i);    //func 返回一个指向含有10个int的数组的指针
+```
+
+
+
+```
+int arr[10]; 
+int *p1[10]; //p1是含有10个指针的数组
+int (*p2)[10] =&arr;  //p2是一个指针，指向含有10个int的数组
+```
+
+
+
+
+
+- 声明一个返回数组指针的函数
+	- 返回数组指针的函数形式：`Type (*function (parameter_list))[dimension]`
+	- 使用类型别名： `typedef int arrT[10];` 或者 `using arrT = int[10]；`，然后 `arrT* func() {...}`
+	- 使用 `decltype`： `decltype(odd) *arrPtr(int i) {...}`
 - **尾置返回类型**： 在形参列表后面以一个`->`开始：`auto func(int i) -> int(*)[10]`（`C++11`）
 
-### 函数重载
+### 6.4 函数重载
 
 - **重载**：如果同一作用域内几个函数名字相同但形参列表不同，我们称之为重载（overload）函数。
 - `main`函数不能重载。
 - **重载和const形参**：
-  - 一个有顶层const的形参和没有它的函数无法区分。 `Record lookup(Phone* const)`和 `Record lookup(Phone*)`无法区分。
-  - 相反，是否有某个底层const形参可以区分。 `Record lookup(Account*)`和 `Record lookup(const Account*)`可以区分。
-- **重载和作用域**：若在内层作用域中声明名字，它将隐藏外层作用域中声明的同名实体，在不同的作用域中无法重载函数名。
+  - 一个有顶层const的形参和另一个没有顶层const的形参，函数无法区分。
+  	-  `Record lookup(Phone* const)`和 `Record lookup(Phone*)`无法区分。
+  	-  `Record lookup(const Phone)`和 `Record lookup(Phone)`无法区分。
+  - 相反，是否有某个底层const形参可以区分。 
+  	- `Record lookup(Account*)`和 `Record lookup(const Account*)`可以区分。
+  	- `Record lookup(Account&)`和 `Record lookup(const Account&)`可以区分。
+- const_cast
+- **重载和作用域**：若在内层作用域中声明名字，它将隐藏外层作用域中声明的同名实体，在不同的作用域中无法重载函数名。一旦在当前作用域中找到了所需的名字，编译器就会忽略掉外层作用域中的同名实体。
 
-### 特殊用途语言特性
+### 6.5 特殊用途语言特性
 
 #### 默认实参
 

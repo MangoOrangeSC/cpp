@@ -15,7 +15,25 @@ STL容器主要分为
 STL提供了三个序列式容器：向量（vector）、双端队列（deque）、列表（list），此外也可以把 string 和 array 当做一种序列式容器。
 强调值的顺序，每个元素有固定的位置。
 
-### 1. vector
+
+
+### 1. array
+
+c++语言本身提供，并非STL
+数组
+array<int,size> 必须指明类型与数组的大小
+
+```
+array<type,size> arr;
+
+arr.front();
+arr.back();
+arr.size();
+```
+
+
+
+### 2. vector
 
 单端数组
 ```
@@ -76,7 +94,7 @@ int main()
 
     sort函数：默认从小大大。对支持随机访问的迭代器的容器，都可以利用sort
 
-5) 容量与大小
+5)容量与大小
 
 ```
     .empty() 
@@ -85,73 +103,6 @@ int main()
     .resize(int num,elem)
     .reverse(int len) 容器预留len个长度，预留位置不初始化，元素不可访问;resize初始化了。该命令主要为了减少vector在动态扩展容量时的扩展次数
 ```
-
-### 2. deque
-
-   deque(double-ended queue 双端队列)：双端数组，可以对头部进行插入删除操作
-   向两端插入元素效率较高！
-   中间插入元素效率较低！
-
-   deque与vector
-   1. vector堆头部插入删除效率很低
-   2. deque堆头部的插入删除速度比vector快
-   3. vector访问元素的速度快
-
-```
-     push_front                            push_back()
-     front()     **--**--**--**--**--**    back()
-     pop_front()                           pop_back()
-    v.rend()/v.begin()                     v.end()/v.rbegin()
-```
-
-   1）构造
-
-	(1) deque<int> d1;
-	(2) deque<int> d2(10);
-	(3) deque<int> d3(n,num);
-
-   2）遍历/数据存取
-
-	可以用迭代器遍历
-	.at(int index)
-	vec[]
-	.front()
-	.back()
-
-```
-void printDeque(const std::deque<int> d)
-{
-    for(std::deque<int>::const_iterator it=d.begin();it!=d.end();it++)
-    {
-        std::cout<<*it<<std::endl;
-    }
-}
-```
-
-
-   3）插入/删除
-
-    .pushback()
-    .popback()
-    .pushfront()
-    .popfront()
-    .insert(iter,ele)
-    .insert(iter,n,elem)
-    .erase(iter)
-    .clear()
-
-   4）排序
-
-    sort函数：默认从小到大
-
-   5) 容量与大小
-
-```
-    .empty()
-    .resize(num)
-    .resize(num,elem)
-```
-
 
 ### 3. list
 
@@ -262,9 +213,224 @@ int main()
 
 ### 4. forward_list
 
-### 5. array
 
-### 6. string
+
+
+
+
+### 5. deque
+
+   deque(double-ended queue 双端队列)：双端数组，可以对头部以及尾部进行插入删除操作
+   向两端插入元素效率较高！
+   中间插入元素效率较低！
+
+   deque与vector
+   1. vector堆头部插入删除效率很低
+   2. deque堆头部的插入删除速度比vector快
+   3. vector访问元素的速度快
+
+```
+     push_front                            push_back()
+     front()     **--**--**--**--**--**    back()
+     pop_front()                           pop_back()
+    v.rend()/v.begin()                     v.end()/v.rbegin()
+```
+
+   1）构造
+
+	(1) deque<int> d1;
+	(2) deque<int> d2(10);
+	(3) deque<int> d3(n,num);
+
+   2）遍历/数据存取
+
+	可以用迭代器遍历
+	.at(int index)
+	vec[]
+	.front()
+	.back()
+
+```
+void printDeque(const std::deque<int> d)
+{
+    for(std::deque<int>::const_iterator it=d.begin();it!=d.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+}
+```
+
+
+   3）插入/删除
+
+    .pushback()
+    .popback()
+    .pushfront()
+    .popfront()
+    .insert(iter,ele)
+    .insert(iter,n,elem)
+    .erase(iter)
+    .clear()
+
+   4）排序
+
+    sort函数：默认从小到大
+
+   5) 容量与大小
+
+```
+    .empty()
+    .resize(num)
+    .resize(num,elem)
+```
+
+
+
+### 6.容器适配器
+
+容器适配器（container adapter）—— 不是独立的容器，只是某种容器的变种，它提供原容器的一个专用的受限接口。特别是，容器适配器不提供迭代器。
+为满足特殊需求，STL还提供了一些特别的（并且预先定义好的）容器配接器，根据基本容器类别实现而成。
+
+#### 6.1. stack
+
+```
+                                   push()
+              **--**--**--**--**--**           top()
+                                   pop()
+           栈底                                               栈顶
+```
+
+    先进后出（First in Last Out）FILO
+
+1）构造
+
+    stack<T> stk;
+
+2）遍历
+
+    只有顶端的元素可以被外界使用，因为不允许遍历
+
+3）插入/删除
+
+    .pop();
+    .top();
+    .push();
+
+4）排序
+
+    无
+
+5）大小操作
+
+    .size()
+    .empty()
+
+#### 6.2. queue
+
+      front->  **---**---**---**---   <-back
+        pop->                         <-push
+    
+    先进先出，First in First Out, FIFO
+
+1）构造
+
+2）遍历
+
+    同stack，不允许由遍历行为
+
+3）插入/删除
+
+    .front();
+    .back();
+    .push;
+    .pop;
+
+4）排序
+
+#### 6.3. priority_queue
+
+和queue不同的就在于我们可以自定义其中数据的优先级, 让优先级高的排在队列前面,优先出队
+优先队列具有队列的所有特性，包括基本操作，只是在这基础上添加了内部的一个排序，它本质是一个堆实现的
+
+1）构造
+
+```
+priority_queue<Type, Container, Functional>
+	Type 就是数据类型，
+	Container 就是容器类型。Container必须是用数组实现的容器，比如vector,deque等等，但不能用 list。STL里面默认用的是vector）
+	Functional 就是比较的方式，当需要用自定义的数据类型时才需要传入这三个参数，使用基本数据类型时，只需要传入数据类型，默认是大顶堆
+
+升序队列（小顶堆） priority_queue<int,vector<int>,greater<int>> q  
+降序队列（大顶堆） priority_queue<int,vector<int>,less<int>> q   等价于默认  priority_queue<int> q
+```
+
+2）遍历
+
+3）插入/删除
+
+4）排序
+
+```
+#include<iostream>
+#include <queue>
+using namespace std;
+int main()
+{
+    //对于基础类型 默认是大顶堆
+    priority_queue<int> a;
+    //等同于 priority_queue<int, vector<int>, less<int> > a;
+
+    //      这里一定要有空格，不然成了右移运算符↓↓
+    priority_queue<int, vector<int>, greater<int> > c;  //这样就是小顶堆
+    priority_queue<string> b;
+
+    for (int i = 0; i < 5; i++)
+    {
+        a.push(i);
+        c.push(i);
+    }
+    while (!a.empty())
+    {
+        cout << a.top() << ' ';
+        a.pop();
+    }
+    cout << endl;
+
+    while (!c.empty())
+    {
+        cout << c.top() << ' ';
+        c.pop();
+    }
+    cout << endl;
+
+    b.push("abc");
+    b.push("abcd");
+    b.push("cbd");
+    while (!b.empty())
+    {
+        cout << b.top() << ' ';
+        b.pop();
+    }
+    cout << endl;
+    return 0;
+}
+```
+结果
+```
+4 3 2 1 0
+0 1 2 3 4
+cbd abcd abc
+```
+
+
+
+
+
+
+
+
+
+### 7. string
 
    Notes: 对于char型赋值，如果不加''，赋的是ascii
    example:char i=1 and char i='1'，后者才是真正的字符1
@@ -297,6 +463,7 @@ int main()
 atoi()的参数是 const char* ,
 因此对于一个字符串str我们必须调用 
 c_str()的方法把这个string转换成 const char*类型的,
+
 ```
 1 std::string str = "123";
 2 int n = atoi(str.c_str());
@@ -425,6 +592,26 @@ public:
 ```
 
 
+
+输出
+
+```
+10
+20
+30
+40
+50
+50
+40
+30
+20
+10
+```
+
+
+
+
+
 5）大小操作
 
     .size()
@@ -458,7 +645,12 @@ public:
     else{
         std::cout<<"second failure!"<<std::endl;
     }
-
+    for(std::multiset<int>::const_iterator it=s.begin();it!=s.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+    
+    
     std::multiset<int> ms;
     ms.insert(6);
     ms.insert(6);
@@ -467,6 +659,21 @@ public:
         std::cout<<*it<<std::endl;
     }
 ```
+
+结果
+
+```
+first done!
+second failure!
+10
+6
+6
+```
+
+
+
+
+
 
 
 ### 2. map
@@ -506,6 +713,10 @@ public:
     如果是map中由自定义类型，则必须指定排序规则
 
 ```
+#include <map>
+#include <iostream>
+
+
 class MyMapCompare
 {
 public:
@@ -514,10 +725,11 @@ public:
         return m>n;
     }
 };
-void testMap()
+int main()
 {
     std::map<int,int,MyMapCompare> m;
     m.insert(std::make_pair(1,11));
+    m.insert(std::make_pair(1,10));    
     m.insert(std::make_pair(2,10));
     m.insert(std::make_pair(3,9));
 
@@ -525,8 +737,21 @@ void testMap()
     {
         std::cout<<"key:"<<it->first<<" val:"<<it->second<<std::endl;
     }
+    return 0;
 }
 ```
+
+
+
+输出
+
+```
+key:3 val:9
+key:2 val:10
+key:1 val:11
+```
+
+
 
 
 
@@ -554,141 +779,7 @@ void testMap()
 3）插入/删除
 4）排序
 
-## 3.容器适配器
 
-容器适配器（container adapter）—— 不是独立的容器，只是某种容器的变种，它提供原容器的一个专用的受限接口。特别是，容器适配器不提供迭代器。
-为满足特殊需求，STL还提供了一些特别的（并且预先定义好的）容器配接器，根据基本容器类别实现而成。
-
-### 1. stack
-
-```
-                                   push()
-              **--**--**--**--**--**           top()
-                                   pop()
-           栈底                                               栈顶
-```
-
-    先进后出（First in Last Out）FILO
-
-1）构造
-
-    stack<T> stk;
-
-2）遍历
-
-    只有顶端的元素可以被外界使用，因为不允许遍历
-
-3）插入/删除
-
-    .pop();
-    .top();
-    .push();
-
-4）排序
-
-    无
-
-5）大小操作
-
-    .size()
-    .empty()
-
-### 2. queue
-
-      front->  **---**---**---**---   <-back
-        pop->                         <-push
-    
-    先进先出，First in First Out, FIFO
-
-1）构造
-
-2）遍历
-
-    同stack，不允许由遍历行为
-
-3）插入/删除
-
-    .front();
-    .back();
-    .push;
-    .pop;
-
-4）排序
-
-### 3. priority_queue
-
-和queue不同的就在于我们可以自定义其中数据的优先级, 让优先级高的排在队列前面,优先出队
-优先队列具有队列的所有特性，包括基本操作，只是在这基础上添加了内部的一个排序，它本质是一个堆实现的
-
-1）构造
-
-```
-priority_queue<Type, Container, Functional>
-	Type 就是数据类型，
-	Container 就是容器类型。Container必须是用数组实现的容器，比如vector,deque等等，但不能用 list。STL里面默认用的是vector）
-	Functional 就是比较的方式，当需要用自定义的数据类型时才需要传入这三个参数，使用基本数据类型时，只需要传入数据类型，默认是大顶堆
-
-升序队列（小顶堆） priority_queue<int,vector<int>,greater<int>> q  
-降序队列（大顶堆） priority_queue<int,vector<int>,less<int>> q   等价于默认  priority_queue<int> q
-```
-
-2）遍历
-
-3）插入/删除
-
-4）排序
-
-```
-#include<iostream>
-#include <queue>
-using namespace std;
-int main()
-{
-    //对于基础类型 默认是大顶堆
-    priority_queue<int> a;
-    //等同于 priority_queue<int, vector<int>, less<int> > a;
-
-    //      这里一定要有空格，不然成了右移运算符↓↓
-    priority_queue<int, vector<int>, greater<int> > c;  //这样就是小顶堆
-    priority_queue<string> b;
-
-    for (int i = 0; i < 5; i++)
-    {
-        a.push(i);
-        c.push(i);
-    }
-    while (!a.empty())
-    {
-        cout << a.top() << ' ';
-        a.pop();
-    }
-    cout << endl;
-
-    while (!c.empty())
-    {
-        cout << c.top() << ' ';
-        c.pop();
-    }
-    cout << endl;
-
-    b.push("abc");
-    b.push("abcd");
-    b.push("cbd");
-    while (!b.empty())
-    {
-        cout << b.top() << ' ';
-        b.pop();
-    }
-    cout << endl;
-    return 0;
-}
-```
-结果
-```
-4 3 2 1 0
-0 1 2 3 4
-cbd abcd abc
-```
 
 
 ##  4 无序集合
