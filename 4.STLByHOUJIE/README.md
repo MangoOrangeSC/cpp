@@ -592,13 +592,29 @@ traits特征，特性；
 
 ![image1](pic/pic104.png)
 
+- 双向进出
+- 分段连续，串接
+- 里面存了很多的指针，如果空间不够需要扩充，就让指针指向一个新的区域
+- 迭代器是一个class。分4部分。node指向控制中心，一个buffer。first/last指的是某一个buffer的头与尾，迭代器每一次移动都要判断是否到达边界，如果达到下一个区域，要通过node回到控制中心指向下一个buffer，维持连续的假象。cur指向元素
+- 所有容器都有两个迭代器start与finish，begin与end指向他们俩
+- map类型T* ，map_size是控制器链表的数量，cur是指向任意一个元素的指针；看起来好像连续，实际上是分段的，每个buffer有一定长度，容器需要头和超尾迭代器即start和finish;
+
 ![image1](pic/pic105.png)
 
+- map是一个vector
+- deque容器本身的大小有两个iterator+map+map_size=16+16+4+4=40字节
+- buffer size是指每个buffer容纳的元素个数
+
 ![image1](pic/pic106.png)
+
+- 定义5个associated type
 
 ![image1](pic/pic107.png)
 
 ![image1](pic/pic108.png)
+
+- 在position安插元素
+-  首先判断是否为头尾插入，直接调用push_front()和push_back(),然后根据离哪一端比较近，开始复制挪位置
 
 ![image1](pic/pic109.png)
 
@@ -618,7 +634,7 @@ traits特征，特性；
 
 ![image1](pic/pic116.png)
 
-## stack
+### stack
 
 ![image1](pic/pic117.png)
 
