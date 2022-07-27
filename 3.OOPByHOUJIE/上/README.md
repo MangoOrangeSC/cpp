@@ -1,22 +1,50 @@
+![image1](pic/pic1.png)
+![image1](pic/pic2.png)
+![image1](pic/pic3.png)
+![image1](pic/pic4.png)
+
+##  1. 头文件与类的声明
+
+### c vs cpp 关于数据和函数
+
+![image1](pic/pic5.png)
+![image1](pic/pic6.png)
+![image1](pic/pic7.png)
+![image1](pic/pic8.png)
+
+### 头文件与类
+
+![image1](pic/pic9.png)
+![image1](pic/pic10.png)
+![image1](pic/pic11.png)
+![image1](pic/pic12.png)
+![image1](pic/pic13.png)
+![image1](pic/pic14.png)
+
+## 2. 构造函数
+
+![image1](pic/pic15.png)
+![image1](pic/pic16.png)
 
 
-## 构造函数
 
 ### 构造函数在private
 
+![image1](pic/pic17.png)
+![image1](pic/pic18.png)
+
+
+
 ![image1](pic/pic24.png)
-
-
-
 
 
 ![image1](pic/pic25.png)
 
 
 
-## 参数传递与返回值
+## 3. 参数传递与返回值
 
-### 
+
 
 ![image1](pic/pic26.png)
 
@@ -79,9 +107,7 @@
 
 
 
-## 操作符重载与临时对象
-
-### 
+## 4. 操作符重载与临时对象
 
 ![image1](pic/pic32.png)
 
