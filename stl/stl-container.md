@@ -10,7 +10,26 @@ STL容器主要分为
     bool empty()：判断容器对象是否为空。
 
 
+
+- 分类：
+	- 1 序列式sequence container；
+		- array 数组。连续空间，指定数组的大小，无法扩充
+		- vector。头部不能动，分配器自动扩充内存
+		- deque。前后均可扩充。
+		- list 链表。双向链表（可环状）
+		- forward-list。单向链表
+	- 2 关联式associative container，便于查找，用key
+		- set/multiset。底层是红黑树，左右高度平衡二分树，标准库没有规定必须是红黑树，但是因为红黑树的性质很好。key=value
+		- multiset:可以重复
+		- map/multimap。key-value
+		- multimap:key可以重复
+	- unordered container 包含于第二种之中。不定序
+		- 上图右侧的小图代表着hashtable，separate chaining，左侧的每一个方框代表一个“篮子”，里面存放了一个指针，或者链表，注意某个链表不可以太长；
+
+
+
 ## 1.顺序容器
+
 序列容器（sequence container顺序容器）—— 将一组具有相同类型T的对象，以严格的线性形式组织在一起。序列容器可以视为数组和链表的推广。其中每个元素均有固定位置—取决于插入时机和地点，和元素值无关。如果你以追加方式对一个群集插入六个元素，它们的排列次序将和插入次序一致。
 STL提供了三个序列式容器：向量（vector）、双端队列（deque）、列表（list），此外也可以把 string 和 array 当做一种序列式容器。
 强调值的顺序，每个元素有固定的位置。
@@ -29,6 +48,9 @@ array<type,size> arr;
 arr.front();
 arr.back();
 arr.size();
+
+arr[2]; //使用 [] 运算符访问超出范围的元素将导致未定义的行为。
+arr.at(2); //使用 at() 函数访问任何超出范围的元素将抛出out_of_range异常。
 ```
 
 
@@ -45,6 +67,7 @@ arr.size();
 
 1）构造
 	
+
 	(1) vector<int> v1;
 	(2) vector<int> v2(10);//指定了刚开始的容量为10，默认值为0
 	(3) vector<int> v3(n,num);//指定了开始的容量n和每个格子的默认值为num
@@ -157,7 +180,7 @@ int main()
     可通过函数或仿函数自定义排序
 
  ```
- void printList(const std::list<int> ll)
+void printList(const std::list<int> ll)
 {
     for(std::list<int>::const_iterator it=ll.begin();it!=ll.end();it++)
     {
@@ -199,7 +222,21 @@ int main()
 
  ```
 
- 
+ 输出：
+
+```
+1
+4
+5
+8
+*******
+8
+5
+4
+1
+```
+
+
 
    5) 大小操作
 
@@ -291,6 +328,8 @@ void printDeque(const std::deque<int> d)
 容器适配器（container adapter）—— 不是独立的容器，只是某种容器的变种，它提供原容器的一个专用的受限接口。特别是，容器适配器不提供迭代器。
 为满足特殊需求，STL还提供了一些特别的（并且预先定义好的）容器配接器，根据基本容器类别实现而成。
 
+stack queue均由deque改编而来
+
 #### 6.1. stack
 
 ```
@@ -326,6 +365,8 @@ void printDeque(const std::deque<int> d)
     .empty()
 
 #### 6.2. queue
+
+只能在队的前端进行删除， 在队的后端进行插入
 
       front->  **---**---**---**---   <-back
         pop->                         <-push
@@ -374,6 +415,7 @@ priority_queue<Type, Container, Functional>
 #include<iostream>
 #include <queue>
 using namespace std;
+
 int main()
 {
     //对于基础类型 默认是大顶堆
@@ -423,6 +465,61 @@ cbd abcd abc
 ```
 
 
+
+例子2：
+
+正常情况下大于号代表降序排序，而此处表现的效果正好相反
+
+令容器进行升序排序，小数在前大数在后，而queue只能先输出小数，所以输出结果为从小到大
+
+```
+#include <queue>
+#include <vector>
+#include <iostream>
+
+struct Node
+{
+    /* data */
+    int x,y;
+    Node(int a=0, int b=0): x(a), y(b) {}
+};
+
+
+struct QueueCompatarot
+{
+    bool operator()(Node a, Node b)
+    {
+        if(a.x == b.x) return a.y>b.y;
+        return a.x>b.x;
+    }
+};
+
+
+void testPriorityQueue()
+{
+    std::priority_queue<Node , std::vector<Node>, QueueCompatarot> pq;
+    for (size_t i = 0; i < 10; i++)
+    {
+        /* code */
+        pq.push(Node(rand(),rand()));
+    }
+
+    while (!pq.empty())
+    {
+        /* code */
+        std::cout<<pq.top().x<<" ";
+        pq.pop();
+    }
+    
+    
+};
+
+int main()
+{
+    //testlist();
+    testPriorityQueue();
+}
+```
 
 
 
@@ -549,15 +646,17 @@ void printSet(std::set<int> se)
 {
     for(std::set<int>::const_iterator it=se.begin();it!=se.end();it++)
     {
-        std::cout<<*it<<std::endl;
+        std::cout<<*it<<" ";
     }
+    std::cout<<std::endl;
 }
 void printSet(std::set<int,MySetCompare> se)
 {
     for(std::set<int,MySetCompare>::const_iterator it=se.begin();it!=se.end();it++)
     {
-        std::cout<<*it<<std::endl;
+        std::cout<<*it<<" ";
     }
+    std::cout<<std::endl;
 }
 
 
@@ -596,16 +695,8 @@ public:
 输出
 
 ```
-10
-20
-30
-40
-50
-50
-40
-30
-20
-10
+10 20 30 40 50 
+50 40 30 20 10 
 ```
 
 

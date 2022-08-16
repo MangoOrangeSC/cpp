@@ -1,3 +1,4 @@
+/*
 #include <map>
 #include <iostream>
 
@@ -30,14 +31,13 @@ int main()
 
 } //namespace testmap
 
-
+*/
 
 
 #include <set>
 #include <iostream>
 
-namespace testset
-{
+
 class MySetCompare
 {
 public:
@@ -51,19 +51,22 @@ void printSet(std::set<int> se)
 {
     for(std::set<int>::const_iterator it=se.begin();it!=se.end();it++)
     {
-        std::cout<<*it<<std::endl;
+        std::cout<<*it<<" ";
     }
+    std::cout<<std::endl;
 }
 void printSet(std::set<int,MySetCompare> se)
 {
     for(std::set<int,MySetCompare>::const_iterator it=se.begin();it!=se.end();it++)
     {
-        std::cout<<*it<<std::endl;
+        std::cout<<*it<<" ";
     }
+    std::cout<<std::endl;
+
 }
 
 
-int main()
+void testset()
 {
     std::set<int> s1;
     s1.insert(10);
@@ -81,7 +84,6 @@ int main()
     s2.insert(30);
     s2.insert(20);
     printSet(s2);
-    return 0;
 }
 
 class myCompare
@@ -92,11 +94,11 @@ public:
         return m>n;
     }
 };
-}//namespace testset
 
 
 
 
+/*
 int main()
 {
     std::set<int> s;
@@ -129,4 +131,96 @@ int main()
     {
         std::cout<<*it<<std::endl;
     }
+}
+*/
+
+
+/*
+#include <list>
+#include <iostream>
+
+void printList(const std::list<int> ll)
+{
+    for(std::list<int>::const_iterator it=ll.begin();it!=ll.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+}
+
+bool myCompare(int m,int n)
+{
+    return m>n;
+}
+
+class myCompare1
+{
+public:
+    bool operator()(int m,int n)
+    {
+        return m>n;
+    }
+};
+
+void testlist()
+{
+    std::list<int> lll;
+    lll.push_back(5);
+    lll.push_back(4);
+    lll.push_back(8);
+    lll.push_back(1);
+    lll.sort();
+    printList(lll);
+    std::cout<<"*******"<<std::endl;
+    lll.sort(myCompare);
+    
+    lll.sort(myCompare1());
+    printList(lll);
+}
+*/
+
+/*
+#include <queue>
+#include <vector>
+#include <iostream>
+
+struct Node
+{
+    int x,y;
+    Node(int a=0, int b=0): x(a), y(b) {}
+};
+
+
+struct QueueCompatarot
+{
+    bool operator()(Node a, Node b)
+    {
+        if(a.x == b.x) return a.y>b.y;
+        return a.x>b.x;
+    }
+};
+
+
+void testPriorityQueue()
+{
+    std::priority_queue<Node , std::vector<Node>, QueueCompatarot> pq;
+    for (size_t i = 0; i < 10; i++)
+    {
+        pq.push(Node(rand(),rand()));
+    }
+
+    while (!pq.empty())
+    {
+        std::cout<<pq.top().x<<" ";
+        pq.pop();
+    }
+    
+    
+};
+*/
+
+int main()
+{
+    //testlist();
+    //testPriorityQueue();
+    testset();
 }
