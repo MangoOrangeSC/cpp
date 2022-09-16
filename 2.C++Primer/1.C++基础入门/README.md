@@ -458,7 +458,7 @@ a
 ```
   int i=0; //拷贝初始化
   int i={0}; //初始化列表
-  int i{0};
+  int i{0}; //初始化列表
   int i(0); //直接初始化
 ```
 > 一般来说，这几种初始化方法可以等价使用，但：
@@ -607,6 +607,7 @@ const int &ri=temp;
 ```
 > 下面的例子与临时量对象有关
 ```
+    //需要强制类型转换的情况
     double j=42.66;
     const int &r3=j;
     //const int &r2=i;
@@ -614,6 +615,15 @@ const int &ri=temp;
 
     j=44.66;
     std::cout<<j<<","<<r3<<","<<std::endl; //44.66 42 
+    
+    
+    //不需要强制类型转换的情况
+    double i = 10.3;
+    const double &i_ = i;
+    std::cout<<i<<","<<i_<<","<<std::endl;  //10.3,10.3,   
+
+    i = 12.3;
+    std::cout<<i<<","<<i_<<","<<std::endl;  //12.3,12.3  
 ```
 
 #### 3 指针和const
