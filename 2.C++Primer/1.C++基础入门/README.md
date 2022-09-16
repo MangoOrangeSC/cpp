@@ -645,7 +645,7 @@ int i=0;
 int *const p1 =&i;   //顶层const
 const int ci=42;	 //顶层const
 const int *p2=&ci;	 //底层const
-const int *const p3=p2; //左底层 右顶层
+const int *const p3=p2; //靠左的const是底层 靠右的const是顶层
 const int &r =ci;	 //底层const
 
 //执行拷贝时，常量是顶层还是底层const区别明显，其中，顶层const无影响
