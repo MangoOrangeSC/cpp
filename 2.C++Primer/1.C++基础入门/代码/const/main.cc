@@ -18,5 +18,7 @@ int main()
     i = 12.3;
     std::cout<<i<<","<<i_<<","<<std::endl;  //12.3,12.3   
 
-
+    // 顶层const不影响指针指向
+    int m = 5;
+    int * const i = &m; 
 }
