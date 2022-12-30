@@ -19,6 +19,11 @@ int main()
     std::cout<<i<<","<<i_<<","<<std::endl;  //12.3,12.3   
 
     // 顶层const不影响指针指向
-    int m = 5;
-    int * const i = &m; 
+    const int m = 5;
+    int * const x = &m; //error
+
+    const int m = 5;
+    const int * const x = &m; //right
+
+
 }
