@@ -708,9 +708,112 @@ int main()
 
 - 两个指针相减的类型是`ptrdiff_t`。
 
-- 建议：初始化所有指针。
-
 - `int* p1, p2;//*是对p1的修饰，所以p2还是int型`
+
+- 建议：初始化所有指针。
+	- 指针在定义时可以不进行初始化，但在使用前必须初始化，无论是何种方式定义的，传统方式或者是智能指针方式。
+
+eg.1 指针声明后未初始化
+```c++
+#include <iostream>
+#include <memory>
+
+int main()
+{
+    int *p;
+    //int *p = new int;
+    *p = 5;
+    std::cout<<*p<<std::endl;
+    /*
+    std::shared_ptr<int> q;
+    q = std::make_shared<int>();
+    *q = 6;
+    std::cout<<*q<<std::endl;
+    */
+}
+```
+输出：
+```shell
+casicapollo@casicapollo-System-Product-Name:~/testcpp/build$ ./testcpp 
+Segmentation fault (core dumped)
+```
+eg.1 指针初始化
+```c++
+#include <iostream>
+#include <memory>
+
+int main()
+{
+    //int *p;
+    int *p = new int;
+    *p = 5;
+    std::cout<<*p<<std::endl;
+    /*
+    std::shared_ptr<int> q;
+    q = std::make_shared<int>();
+    *q = 6;
+    std::cout<<*q<<std::endl;
+    */
+}
+```
+输出
+```
+casicapollo@casicapollo-System-Product-Name:~/testcpp/build$ ./testcpp 
+5
+```
+eg.2 智能指针
+```
+#include <iostream>
+#include <memory>
+
+int main()
+{
+    //int *p;
+    int *p = new int;
+    *p = 5;
+    std::cout<<*p<<std::endl;
+    
+    std::shared_ptr<int> q;
+    //q = std::make_shared<int>();
+    *q = 6;
+    std::cout<<*q<<std::endl;
+    
+}
+```
+
+```
+casicapollo@casicapollo-System-Product-Name:~/testcpp/build$ ./testcpp 
+5
+Segmentation fault (core dumped)
+```
+
+```
+#include <iostream>
+#include <memory>
+
+int main()
+{
+    //int *p;
+    int *p = new int;
+    *p = 5;
+    std::cout<<*p<<std::endl;
+    
+    std::shared_ptr<int> q;
+    q = std::make_shared<int>();
+    *q = 6;
+    std::cout<<*q<<std::endl;
+    
+}
+```
+
+```
+casicapollo@casicapollo-System-Product-Name:~/testcpp/build$ ./testcpp 
+5
+6
+```
+
+
+
 
 #### 理解复合类型的声明
 
